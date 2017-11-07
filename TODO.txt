@@ -1,0 +1,9 @@
+To Do
+
+1) DONE :: Wrap the processing of the image list in a check, if there are no images found do no try to process anything
+but send an email to the recipient saying that there were no images.
+
+2) Log4j configuration resolve the issue with the output stream so that we log to the file properly
+
+3) Performance improvements
+	1) Put each job found into its own thread so that it processes them in parallel.

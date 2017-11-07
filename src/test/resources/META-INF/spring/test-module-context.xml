@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<description>Job to process image download jobs</description>
+ 	
+	<batch:job id="imageDownloadJob">
+		<batch:step id="step"  >			
+			<batch:tasklet start-limit="100" >
+				<batch:chunk reader="jdbcReader" processor="processor" writer="writer" commit-interval="1" />
+			</batch:tasklet>
+		</batch:step>
+	</batch:job> 
+	
+	<bean id="jdbcReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="sql" value="SELECT * FROM bgx_image_download_jobs WHERE status = ?"/>
+		<property name="rowMapper" ref="idjMapper"/>
+		<property name="preparedStatementSetter" ref="preparedStatementSetter"/>
+	</bean>
+	
+	<bean id="idjMapper" class="com.qs.image_packager.jdbc.ImageDownloadJobsRowMapper"/>
+	
+</beans>

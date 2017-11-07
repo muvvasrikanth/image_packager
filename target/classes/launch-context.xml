@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:property-placeholder location="file:./batch.properties" />
+
+	<context:component-scan base-package="com.qs.image_packager" />
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver" />
+		<property name="url"
+			value="${batch.jdbc.url}" />
+		<property name="username" value="${batch.jdbc.user}" />
+		<property name="password" value="${batch.jdbc.password}" />
+	</bean>
+	
+	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository"/>
+	</bean>
+	
+	<bean id="jobRepository"
+		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager"/>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="configuration" class="com.qs.image_packager.configuration.ImagePackagerConfiguration">
+		<property name="baseUrl" value="${base.s3.url}"/>
+		<property name="s3ServiceUrl" value="${s3.service.url}"/>
+		<property name="s3BucketUrl" value="${s3.bucket.url}"/>
+		<property name="fsTempPath" value="${fs.temp.path}"/>
+		<property name="s3BucketName" value="${s3.bucket.name}"/>
+		<property name="s3AccessKey" value="${s3.access.key}"/>
+		<property name="s3SecretKey" value="${s3.secret.key}"/>
+		<property name="supportEmailAddress" value="${support.email.address}"/>
+	</bean>
+	
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${email.host}" />
+        <property name="port" value="${email.port}" />
+        <property name="username" value="${email.user}" />
+        <property name="password" value="${email.password}" />
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="log4jInit" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod">
+			<value>org.springframework.util.Log4jConfigurer.initLogging</value>
+		</property>
+		<property name="arguments">
+			<list>
+				<value>file:./log4j.xml</value>
+			</list>
+		</property>
+	</bean>	
+    
+	<import resource="classpath:/META-INF/spring/module-context.xml" />
+
+</beans>

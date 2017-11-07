@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<imageDownloadJob>
+	<downloadDate>2014-07-17T00:00:00-07:00</downloadDate>
+	<email>jason.tryon@quiksilver.com</email>
+	<id>1</id>
+	<lastActiveDate>2014-07-17T00:00:00-07:00</lastActiveDate>
+	<s3Path></s3Path>
+	<status>N</status>
+	<statusMessage>Pending</statusMessage>
+	<styles>303284-DKR, ADBS300033-IND, 303266-BLK</styles>
+</imageDownloadJob>
